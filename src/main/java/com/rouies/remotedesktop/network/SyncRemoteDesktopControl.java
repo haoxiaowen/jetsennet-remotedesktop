@@ -141,6 +141,7 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 			if(!StringUtils.isEmptyOrNull(devId)){
 				out.write(this.getDevInfo(devId.toString()).getBytes());
 				out.flush();
+				out.close();
 				return;
 			}
 		} else if(ctlCode.equals("00102")){
@@ -148,6 +149,7 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 			if(!StringUtils.isEmptyOrNull(devId)){
 				out.write(this.getGpsInfo(devId.toString()).getBytes());
 				out.flush();
+				out.close();
 				return;
 			}
 		} else {
@@ -170,8 +172,10 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 			//System.out.println("成功");
 		} else {
 			out.write(String.format(res, "3","0","0").getBytes());
+			//System.out.println("失败");
 		}
 		out.flush();
+		out.close();
 	}
 
 	/**
@@ -181,14 +185,18 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 	 */
 	public String getDevInfo(String devCode){
 		String process = "";
-		Jedis jedis;
+		Jedis jedis=null;
 		try {
 			jedis = RedisContext.getClient("JMC");
 			jedis.select(0);//心跳
 			process = jedis.get("USER:"+devCode);
-			System.out.println("----------------------------process:"+process);
+			//System.out.println("----------------------------process:"+process);
 		} catch (RedisException e) {
 			e.printStackTrace();
+		}finally{
+			if(null != jedis){
+				jedis.close();
+			}
 		}
 		return process;
 	}
@@ -200,14 +208,18 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 	 */
 	public String getGpsInfo(String devCode){
 		String gpsVal = "";
-		Jedis jedis;
+		Jedis jedis = null;
 		try {
 			jedis = RedisContext.getClient("JMC");
 			jedis.select(2);//心跳
 			gpsVal = jedis.get("USER:"+devCode);
-			System.out.println("----------------------------gps:"+gpsVal);
+			//System.out.println("----------------------------gps:"+gpsVal);
 		} catch (RedisException e) {
 			e.printStackTrace();
+		}finally{
+			if(null != jedis){
+				jedis.close();
+			}
 		}
 		return gpsVal;
 	}
