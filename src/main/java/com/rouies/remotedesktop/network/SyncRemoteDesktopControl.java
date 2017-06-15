@@ -57,6 +57,8 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 		Object id   =    val.get("id");
 		Object timeout = val.get("timeout");
 		Object reqId =   val.get("requestId");
+		System.out.println("------command(reqId,ctlCode,address,port):"+reqId+","+ctlCode+","+address+","+port);
+		
 		String res = "{\"s\":%s,\"w\":%s,\"h\":%s}";
 		if(StringUtils.isEmptyOrNull(timeout)){
 			timeout = "10000";
@@ -169,10 +171,10 @@ public class SyncRemoteDesktopControl extends HttpServlet {
 		}
 		if(rp != null){
 			out.write(String.format(res, "0","0","0").getBytes());
-			//System.out.println("成功");
+			System.out.println("++++++成功");
 		} else {
 			out.write(String.format(res, "3","0","0").getBytes());
-			//System.out.println("失败");
+			System.out.println("++++++失败");
 		}
 		out.flush();
 		out.close();
